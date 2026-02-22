@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI .gitignore 生成器</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f0f13;--surface:#1a1a24;--surface2:#242436;--border:#2e2e45;--pri:#6c5ce7;--pri2:#7c6ef7;--acc:#00cec9;--txt:#e8e8f0;--txt2:#9090a8;--red:#ff6b6b;--grn:#51cf66;--yel:#ffd43b;--r:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;line-height:1.6}
+.ctn{max-width:1200px;margin:0 auto;padding:20px}
+header{text-align:center;padding:40px 0 30px}
+header h1{font-size:2.2rem;background:linear-gradient(135deg,var(--pri),var(--acc));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+header p{color:var(--txt2);font-size:1rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}
+.pnl{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;box-shadow:0 4px 24px rgba(0,0,0,.3)}
+.pt{font-size:1.1rem;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.full{grid-column:1/-1}
+.ai-row{display:flex;gap:12px}
+input[type=text],input[type=password]{padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--txt);font-size:.9rem;outline:none;transition:border-color .2s}
+input:focus{border-color:var(--pri)}
+input::placeholder{color:var(--txt2)}
+.b{padding:10px 20px;border:none;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.bp{background:var(--pri);color:#fff}.bp:hover{background:var(--pri2);transform:translateY(-1px)}
+.bp:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.bs{background:var(--surface2);color:var(--txt);border:1px solid var(--border)}.bs:hover{border-color:var(--pri);color:var(--pri)}
+.bg{background:var(--grn);color:#000}.bg:hover{opacity:.9}
+.bd{background:transparent;color:var(--red);border:1px solid var(--red)}.bd:hover{background:var(--red);color:#fff}
+.sm{padding:6px 12px;font-size:.8rem}
+.cats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.cat{padding:6px 14px;border-radius:20px;background:var(--surface2);border:1px solid var(--border);color:var(--txt2);cursor:pointer;font-size:.85rem;transition:all .2s}
+.cat:hover,.cat.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.tg{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;max-height:380px;overflow-y:auto;padding-right:4px}
+.tg::-webkit-scrollbar{width:5px}.tg::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.ti{padding:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;text-align:center;font-size:.82rem;transition:all .2s;user-select:none}
+.ti:hover{border-color:var(--pri)}.ti.on{background:var(--pri);border-color:var(--pri);color:#fff}
+.ti em{font-size:1.3rem;display:block;margin-bottom:2px;font-style:normal}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;min-height:28px}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;background:var(--pri);color:#fff;border-radius:16px;font-size:.78rem}
+.tag u{cursor:pointer;text-decoration:none;opacity:.7;font-size:.9rem}.tag u:hover{opacity:1}
+#out{width:100%;height:380px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--acc);font-family:"Fira Code",monospace;font-size:.83rem;padding:14px;resize:vertical;outline:none;line-height:1.7}
+#out:focus{border-color:var(--pri)}
+.acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.cust{margin-top:16px}.cust .ir{display:flex;gap:8px}
+.cust input{flex:1}
+.sts{display:flex;gap:16px;margin-top:12px}.st{font-size:.8rem;color:var(--txt2)}.st b{color:var(--acc);font-weight:600}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.sc{background:var(--surface2);border-radius:8px;padding:12px}
+.sc code{background:var(--bg);padding:2px 6px;border-radius:4px;color:var(--acc);font-size:.83rem}
+.sc p{color:var(--txt2);font-size:.8rem;margin-top:4px}
+.el{margin-top:12px}
+.ei{display:flex;align-items:start;gap:8px;padding:8px 12px;border-radius:6px;margin-bottom:6px;font-size:.83rem}
+.ei.w{background:rgba(255,212,59,.1);color:var(--yel)}
+.ei.e{background:rgba(255,107,107,.1);color:var(--red)}
+.ei.i{background:rgba(0,206,201,.1);color:var(--acc)}
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;background:var(--grn);color:#000;border-radius:8px;font-weight:600;font-size:.9rem;transform:translateY(100px);opacity:0;transition:all .3s;z-index:99}
+.toast.on{transform:translateY(0);opacity:1}
+.ld{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media(max-width:768px){.grid{grid-template-columns:1fr}.ai-row{flex-direction:column}}
+footer{text-align:center;padding:30px 0;color:var(--txt2);font-size:.8rem}
+</style>
+</head>
+<body>
+<div class="ctn">
+<header>
+<h1>🚀 AI .gitignore 生成器</h1>
+<p>智能生成 .gitignore — 选择技术栈或让 AI 帮你推荐</p>
+</header>
+<div class="grid">
+<!-- API Key -->
+<div class="pnl full" style="padding:16px 24px;display:flex;align-items:center;gap:12px">
+<label style="font-size:.9rem;white-space:nowrap;color:var(--txt2)">🔑 DeepSeek API Key:</label>
+<input type="password" id="apiKey" placeholder="sk-..." style="flex:1" />
+<button class="b bs sm" onclick="toggleKey()">👁</button>
+</div>
+
+<!-- AI Section -->
+<div class="pnl full">
+<div class="pt">🤖 AI 智能推荐</div>
+<div class="ai-row">
+<input type="text" id="aiInput" placeholder="描述你的项目，如：React + Node.js 全栈项目，使用 MongoDB..." style="flex:1" onkeydown="if(event.key==='Enter')aiRecommend()" />
+<button class="b bp" id="aiBtn" onclick="aiRecommend()">✨ AI 推荐</button>
+</div>
+</div>
+
+<!-- Tech Stack -->
+<div class="pnl">
+<div class="pt">📦 选择技术栈</div>
+<div class="cats" id="cats"></div>
+<div class="tg" id="techGrid"></div>
+<div class="tags" id="selTags"></div>
+</div>
+
+<!-- Output -->
+<div class="pnl">
+<div class="pt">📄 生成的 .gitignore</div>
+<div class="output-area">
+<textarea id="out" placeholder="选择技术栈或使用 AI 推荐来生成 .gitignore..."></textarea>
+</div>
+<div class="acts">
+<button class="b bg sm" onclick="copyOut()">📋 复制</button>
+<button class="b bp sm" onclick="dlOut()">⬇ 下载</button>
+<button class="b bs sm" onclick="checkErr()">🔍 检查错误</button>
+<button class="b bs sm" onclick="aiExplain()">💡 AI 解释</button>
+<button class="b bd sm" onclick="clearAll()">🗑 清空</button>
+</div>
+<div class="cust">
+<div class="pt" style="font-size:.95rem">✏️ 添加自定义规则</div>
+<div class="ir">
+<input type="text" id="custRule" placeholder="输入规则，如 *.log 或 build/" onkeydown="if(event.key==='Enter')addCust()" />
+<button class="b sm bs" onclick="addCust()">添加</button>
+</div>
+</div>
+<div class="sts" id="stats"></div>
+<div class="el" id="errList"></div>
+</div>
+
+<!-- Syntax -->
+<div class="pnl full">
+<div class="pt">📖 .gitignore 语法参考</div>
+<div class="sg">
+<div class="sc"><code>#</code> 注释<p>以 # 开头的行是注释，不会生效</p></div>
+<div class="sc"><code>*</code> 通配符<p>匹配任意字符（不含 /），如 *.log</p></div>
+<div class="sc"><code>**</code> 递归匹配<p>匹配任意层级目录，如 **/build/</p></div>
+<div class="sc"><code>?</code> 单字符<p>匹配单个任意字符</p></div>
+<div class="sc"><code>/</code> 目录<p>以 / 结尾表示目录，如 node_modules/</p></div>
+<div class="sc"><code>!</code> 取反<p>! 开头表示不忽略，如 !.gitkeep</p></div>
+<div class="sc"><code>[abc]</code> 字符集<p>匹配方括号内任一字符</p></div>
+<div class="sc"><code>dir/</code> 仅目录<p>只匹配目录，不匹配同名文件</p></div>
+</div>
+</div>
+</div>
+<footer>AI .gitignore Generator — Powered by DeepSeek</footer>
+<div class="toast" id="toast"></div>
+<script>
+const T={
+"Node.js":{cat:"后端",e:"📗",r:`node_modules/\npackage-lock.json\nyarn.lock\npnpm-lock.yaml\n.npm\n.yarn/\n.pnp.*\ndist/\nbuild/\n.env\n.env.*\n!.env.example\ncoverage/\n.nyc_output/\n*.tsbuildinfo\n.eslintcache\n.node_repl_history\n*.log\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*\n.cache/`},
+"Python":{cat:"后端",e:"🐍",r:`__pycache__/\n*.py[cod]\n*$py.class\n*.so\n.Python\nbuild/\ndevelop-eggs/\ndist/\ndownloads/\neggs/\n.eggs/\nlib/\nlib64/\nparts/\nsdist/\nvar/\nwheels/\n*.egg-info/\n.installed.cfg\n*.egg\n.env\n.venv\nvenv/\nENV/\n*.manifest\n*.spec\npip-log.txt\n.mypy_cache/\n.pytest_cache/\n.coverage\nhtmlcov/\n.ipynb_checkpoints`},
+"Java":{cat:"后端",e:"☕",r:`*.class\n*.jar\n*.war\n*.ear\n*.nar\nhs_err_pid*\ntarget/\n.gradle/\nbuild/\n.settings/\n.project\n.classpath\n.factorypath\nout/\n*.iml\n.idea/`},
+"Go":{cat:"后端",e:"🐹",r:`*.exe\n*.exe~\n*.dll\n*.so\n*.dylib\n*.test\n*.out\nvendor/\ngo.work\n.env\nbin/\n*.prof`},
+"Rust":{cat:"后端",e:"🦀",r:`/target/\nCargo.lock\n**/*.rs.bk\n*.pdb`},
+"Ruby":{cat:"后端",e:"💎",r:`*.gem\n*.rbc\n/.config\n/coverage/\n/InstalledFiles\n/pkg/\n/spec/reports/\n/test/tmp/\n/test/version_tmp/\n/tmp/\n.bundle/\nvendor/bundle\n.env\nGemfile.lock`},
+"PHP":{cat:"后端",e:"🐘",r:`/vendor/\ncomposer.lock\n.env\n*.cache\n*.log\nstorage/\nbootstrap/cache/`},
+"C/C++":{cat:"后端",e:"⚙️",r:`*.o\n*.obj\n*.so\n*.dylib\n*.dll\n*.a\n*.lib\n*.exe\n*.out\n*.app\nbuild/\ncmake-build*/\n.cache/\ncompile_commands.json\n*.dSYM/`},
+"C#/.NET":{cat:"后端",e:"🔷",r:`bin/\nobj/\n*.user\n*.suo\n*.cache\n*.dll\n*.exe\n*.pdb\npackages/\n.vs/\n*.nupkg\nproject.lock.json`},
+"Swift":{cat:"移动端",e:"🍎",r:`.build/\nPackages/\nxcuserdata/\n*.xcscmblueprint\n*.xccheckout\nDerivedData/\n*.moved-aside\n*.pbxuser\n*.perspectivev3\n!default.pbxuser\n!default.perspectivev3\n*.hmap\n*.ipa\n*.dSYM.zip\n*.dSYM\nPlayground.playground/`},
+"Kotlin":{cat:"移动端",e:"🟣",r:`*.class\n*.jar\n*.war\n.gradle/\nbuild/\n.idea/\n*.iml\nout/\n.kotlin/`},
+"Flutter":{cat:"移动端",e:"🦋",r:`.dart_tool/\n.packages\nbuild/\n.flutter-plugins\n.flutter-plugins-dependencies\n*.iml\n.idea/\n*.lock\npubspec.lock\n.fvm/`},
+"React Native":{cat:"移动端",e:"📱",r:`node_modules/\n.expo/\ndist/\nnpm-debug.*\n*.jks\n*.p8\n*.p12\n*.key\n*.mobileprovision\n*.orig.*\nweb-build/\n.env`},
+"React":{cat:"前端",e:"⚛️",r:`node_modules/\nbuild/\ndist/\n.env\n.env.local\n.env.*.local\ncoverage/\n.eslintcache\n*.log\n.cache/`},
+"Vue":{cat:"前端",e:"💚",r:`node_modules/\ndist/\n.env.local\n.env.*.local\ncoverage/\n*.log\n.cache/\n.eslintcache\n*.tsbuildinfo`},
+"Angular":{cat:"前端",e:"🅰️",r:`node_modules/\ndist/\ntmp/\nout-tsc/\n.angular/\n.sass-cache/\nconnect.lock\ncoverage/\n*.log\n.env`},
+"Svelte":{cat:"前端",e:"🔥",r:`node_modules/\nbuild/\n.svelte-kit/\n.env\n.env.*\n!.env.example\npackage/\n*.log`},
+"Next.js":{cat:"前端",e:"▲",r:`node_modules/\n.next/\nout/\nbuild/\n.env*.local\ncoverage/\n*.log\n.vercel\n.cache/`},
+"Nuxt":{cat:"前端",e:"💚",r:`node_modules/\n.nuxt/\n.output/\ndist/\n.env\n*.log\n.nitro/\n.cache/`},
+"Vite":{cat:"前端",e:"⚡",r:`node_modules/\ndist/\n*.local\n.env.*\n!.env.example\n*.log`},
+"HTML/CSS":{cat:"前端",e:"🌐",r:`.sass-cache/\n*.css.map\n*.sass.map\n*.less.map\nnode_modules/\nbower_components/`},
+"Django":{cat:"框架",e:"🎸",r:`*.pyc\ndb.sqlite3\nmedia/\nstaticfiles/\n.env\n*.log\n__pycache__/\n*.pot\n*.mo\nlocal_settings.py`},
+"Flask":{cat:"框架",e:"🧪",r:`*.pyc\n__pycache__/\ninstance/\n.webassets-cache\n.env\n*.db\nmigrations/\nvenv/`},
+"Spring Boot":{cat:"框架",e:"🌱",r:`target/\n.gradle/\nbuild/\n*.jar\n*.war\n.idea/\n*.iml\napplication-local.*\n.env`},
+"Laravel":{cat:"框架",e:"🔴",r:`/vendor/\n/node_modules/\n.env\nHomestead.yaml\nHomestead.json\n*.cache\nstorage/*.key\npublic/hot\npublic/storage\n*.log`},
+"Express":{cat:"框架",e:"🚂",r:`node_modules/\n.env\n*.log\ncoverage/\ndist/\nbuild/\nuploads/`},
+"Docker":{cat:"DevOps",e:"🐳",r:`Dockerfile*.bak\ndocker-compose*.bak\n.docker/`},
+"Kubernetes":{cat:"DevOps",e:"☸️",r:`*.kubeconfig\n*.tfstate\n*.tfstate.backup\nsecrets.yaml\n.helm/`},
+"Terraform":{cat:"DevOps",e:"🏗️",r:`.terraform/\n*.tfstate\n*.tfstate.*\ncrash.log\n*.tfvars\noverride.tf\noverride.tf.json\n.terraformrc\nterraform.rc`},
+"GitHub Actions":{cat:"DevOps",e:"🔄",r:``},
+"Nginx":{cat:"DevOps",e:"🌐",r:`*.conf.bak\nlogs/\n*.pid`},
+"VS Code":{cat:"IDE",e:"💙",r:`.vscode/*\n!.vscode/settings.json\n!.vscode/tasks.json\n!.vscode/launch.json\n!.vscode/extensions.json\n*.code-workspace\n.history/`},
+"IntelliJ":{cat:"IDE",e:"🧠",r:`.idea/\n*.iml\n*.iws\n*.ipr\nout/\n.idea_modules/`},
+"Vim":{cat:"IDE",e:"📝",r:`[._]*.s[a-v][a-z]\n!*.svg\n[._]*.sw[a-p]\n[._]s[a-rt-v][a-z]\n[._]ss[a-gi-z]\n[._]sw[a-p]\nSession.vim\nNetrwhist\n*~\ntags`},
+"Xcode":{cat:"IDE",e:"🔨",r:`xcuserdata/\n*.xcscmblueprint\n*.xccheckout\nbuild/\nDerivedData/\n*.pbxuser\n*.perspectivev3`},
+"macOS":{cat:"系统",e:"🍎",r:`.DS_Store\n.AppleDouble\n.LSOverride\nIcon\\r\n._*\n.Spotlight-V100\n.Trashes\n.AppleDB\n.AppleDesktop`},
+"Windows":{cat:"系统",e:"🪟",r:`Thumbs.db\nThumbs.db:encryptable\nehthumbs.db\n*.stackdump\n[Dd]esktop.ini\n$RECYCLE.BIN/\n*.lnk`},
+"Linux":{cat:"系统",e:"🐧",r:`*~\n.fuse_hidden*\n.directory\n.Trash-*\n.nfs*`},
+"Git":{cat:"通用",e:"📌",r:`.gitattributes\n*.orig\n*.BACKUP.*\n*.BASE.*\n*.LOCAL.*\n*.REMOTE.*`},
+"Logs":{cat:"通用",e:"📋",r:`*.log\nlogs/\n*.log.*\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*`},
+"Database":{cat:"通用",e:"🗄️",r:`*.sql\n*.sqlite\n*.sqlite3\n*.db\ndump.rdb\n*.rdb`},
+"Env":{cat:"通用",e:"🔐",r:`.env\n.env.*\n!.env.example\n!.env.template\n*.pem\n*.key\n*.cert\nsecrets/`},
+"Archives":{cat:"通用",e:"📦",r:`*.zip\n*.tar.gz\n*.rar\n*.7z\n*.bz2\n*.gz\n*.xz`},
+"Media":{cat:"通用",e:"🎬",r:`*.mp4\n*.avi\n*.mov\n*.wmv\n*.mp3\n*.wav\n*.flac\n*.psd\n*.ai`}
+};
+const CATS=["全部","前端","后端","框架","移动端","DevOps","IDE","系统","通用"];
+let sel=new Set(),custRules=[];
+function init(){
+  const cDiv=document.getElementById('cats');
+  CATS.forEach(c=>{
+    const b=document.createElement('span');
+    b.className='cat'+(c==='全部'?' on':'');
+    b.textContent=c;
+    b.onclick=()=>{cDiv.querySelectorAll('.cat').forEach(x=>x.classList.remove('on'));b.classList.add('on');renderGrid(c)};
+    cDiv.appendChild(b);
+  });
+  renderGrid('全部');
+}
+function renderGrid(cat){
+  const g=document.getElementById('techGrid');
+  g.innerHTML='';
+  Object.entries(T).forEach(([name,v])=>{
+    if(cat!=='全部'&&v.cat!==cat)return;
+    const d=document.createElement('div');
+    d.className='ti'+(sel.has(name)?' on':'');
+    d.innerHTML=`<em>${v.e}</em>${name}`;
+    d.onclick=()=>{sel.has(name)?sel.delete(name):sel.add(name);d.classList.toggle('on');renderTags();genOutput()};
+    g.appendChild(d);
+  });
+}
+function renderTags(){
+  const t=document.getElementById('selTags');
+  t.innerHTML='';
+  sel.forEach(n=>{
+    const s=document.createElement('span');
+    s.className='tag';
+    s.innerHTML=`${T[n].e} ${n} <u onclick="sel.delete('${n}');renderTags();genOutput();renderGrid(document.querySelector('.cat.on').textContent)">×</u>`;
+    t.appendChild(s);
+  });
+}
+function genOutput(){
+  let lines=['# Auto-generated by AI .gitignore Generator','# https://github.com/gitignore',''];
+  const groups={};
+  sel.forEach(n=>{if(T[n])groups[n]=T[n].r});
+  Object.entries(groups).forEach(([name,rules])=>{
+    lines.push(`# === ${name} ===`);
+    rules.split('\n').forEach(r=>{if(r.trim())lines.push(r.trim())});
+    lines.push('');
+  });
+  if(custRules.length){
+    lines.push('# === Custom Rules ===');
+    custRules.forEach(r=>lines.push(r));
+    lines.push('');
+  }
+  document.getElementById('out').value=lines.join('\n');
+  updStats();
+}
+function updStats(){
+  const txt=document.getElementById('out').value;
+  const lines=txt.split('\n');
+  const rules=lines.filter(l=>l.trim()&&!l.trim().startsWith('#')).length;
+  const comments=lines.filter(l=>l.trim().startsWith('#')).length;
+  document.getElementById('stats').innerHTML=
+    `<span class="st">技术栈: <b>${sel.size}</b></span>`+
+    `<span class="st">规则数: <b>${rules}</b></span>`+
+    `<span class="st">注释: <b>${comments}</b></span>`+
+    `<span class="st">总行数: <b>${lines.length}</b></span>`;
+}
+function addCust(){
+  const inp=document.getElementById('custRule');
+  const v=inp.value.trim();
+  if(!v)return;
+  custRules.push(v);
+  inp.value='';
+  genOutput();
+  toast('已添加自定义规则');
+}
+function copyOut(){
+  const t=document.getElementById('out').value;
+  if(!t){toast('没有内容可复制');return}
+  navigator.clipboard.writeText(t).then(()=>toast('已复制到剪贴板 ✓'));
+}
+function dlOut(){
+  const t=document.getElementById('out').value;
+  if(!t){toast('没有内容可下载');return}
+  const b=new Blob([t],{type:'text/plain'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(b);
+  a.download='.gitignore';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('下载成功 ✓');
+}
+function clearAll(){
+  sel.clear();custRules=[];
+  document.getElementById('out').value='';
+  document.getElementById('errList').innerHTML='';
+  document.getElementById('stats').innerHTML='';
+  renderGrid(document.querySelector('.cat.on').textContent);
+  renderTags();
+  toast('已清空');
+}
+function toggleKey(){
+  const i=document.getElementById('apiKey');
+  i.type=i.type==='password'?'text':'password';
+}
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),2500);
+}
+function checkErr(){
+  const txt=document.getElementById('out').value;
+  const el=document.getElementById('errList');
+  el.innerHTML='';
+  if(!txt.trim()){el.innerHTML='<div class="ei i">ℹ️ 没有内容可检查</div>';return}
+  const lines=txt.split('\n');
+  const errs=[];
+  const seen=new Set();
+  lines.forEach((l,i)=>{
+    const t=l.trim();
+    if(!t||t.startsWith('#'))return;
+    if(seen.has(t))errs.push({t:'w',m:`第 ${i+1} 行: "${t}" 重复规则`});
+    seen.add(t);
+    if(t.includes(' ')&&!t.startsWith('\\'))errs.push({t:'w',m:`第 ${i+1} 行: "${t}" 包含空格，可能需要转义`});
+    if(t.startsWith('/')&&t.endsWith('/'))errs.push({t:'i',m:`第 ${i+1} 行: "${t}" 绝对路径+目录匹配，仅匹配根目录下`});
+    if(t==='*')errs.push({t:'e',m:`第 ${i+1} 行: "*" 会忽略所有文件！`});
+    if(t.includes('\\')&&!t.includes('\\r'))errs.push({t:'i',m:`第 ${i+1} 行: 包含反斜杠，注意转义`});
+  });
+  const rules=lines.filter(l=>l.trim()&&!l.trim().startsWith('#'));
+  if(rules.length>200)errs.push({t:'w',m:`规则数量较多(${rules.length})，建议精简`});
+  if(!lines.some(l=>l.includes('.env')))errs.push({t:'i',m:'建议添加 .env 规则以保护敏感信息'});
+  if(!lines.some(l=>l.includes('.DS_Store'))&&navigator.platform.includes('Mac'))errs.push({t:'i',m:'macOS 用户建议添加 .DS_Store'});
+  if(errs.length===0)el.innerHTML='<div class="ei i">✅ 未发现问题，.gitignore 看起来不错！</div>';
+  else errs.forEach(e=>el.innerHTML+=`<div class="ei ${e.t}">${e.t==='e'?'❌':e.t==='w'?'⚠️':'ℹ️'} ${e.m}</div>`);
+}
+async function callAI(messages){
+  const key=document.getElementById('apiKey').value.trim();
+  if(!key){toast('请先输入 DeepSeek API Key');return null}
+  const res=await fetch('https://api.deepseek.com/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body:JSON.stringify({model:'deepseek-chat',messages,temperature:0.3,max_tokens:2000})
+  });
+  if(!res.ok){const e=await res.text();throw new Error('API 错误: '+res.status+' '+e)}
+  const d=await res.json();
+  return d.choices[0].message.content;
+}
+async function aiRecommend(){
+  const inp=document.getElementById('aiInput').value.trim();
+  if(!inp){toast('请输入项目描述');return}
+  const btn=document.getElementById('aiBtn');
+  btn.disabled=true;btn.innerHTML='<span class="ld"></span> 分析中...';
+  try{
+    const prompt=`你是一个 .gitignore 专家。用户描述了他们的项目，请分析并返回：
+1. 识别出的技术栈列表（从以下选项中选择）：${Object.keys(T).join(', ')}
+2. 生成完整的 .gitignore 内容
+
+请严格按以下 JSON 格式返回（不要包含 markdown 代码块标记）：
+{"techs":["技术栈1","技术栈2"],"gitignore":"完整的 .gitignore 内容"}
+
+用户项目描述：${inp}`;
+    const r=await callAI([{role:'user',content:prompt}]);
+    let data;
+    try{
+      let clean=r.trim();
+      if(clean.startsWith('```'))clean=clean.replace(/^```\w*\n?/,'').replace(/\n?```$/,'');
+      data=JSON.parse(clean);
+    }catch(e){
+      document.getElementById('out').value=r;
+      updStats();toast('AI 已生成内容');return;
+    }
+    if(data.techs){
+      sel.clear();
+      data.techs.forEach(t=>{if(T[t])sel.add(t)});
+      renderTags();
+      renderGrid(document.querySelector('.cat.on').textContent);
+    }
+    if(data.gitignore){
+      document.getElementById('out').value=data.gitignore;
+    }else{
+      genOutput();
+    }
+    updStats();
+    toast(`AI 识别了 ${sel.size} 个技术栈 ✓`);
+  }catch(e){
+    toast('错误: '+e.message);
+  }finally{
+    btn.disabled=false;btn.innerHTML='✨ AI 推荐';
+  }
+}
+async function aiExplain(){
+  const txt=document.getElementById('out').value.trim();
+  if(!txt){toast('没有内容可解释');return}
+  const btn=event.target;
+  btn.disabled=true;btn.innerHTML='<span class="ld"></span> 解释中...';
+  try{
+    const prompt=`请逐行解释以下 .gitignore 文件的每条规则的作用，用简洁的中文说明。对于注释行和空行可以跳过。格式：每行规则后面加上 # 解释
+
+.gitignore 内容：
+${txt}`;
+    const r=await callAI([{role:'user',content:prompt}]);
+    document.getElementById('out').value=r;
+    updStats();toast('AI 解释已生成 ✓');
+  }catch(e){toast('错误: '+e.message)}
+  finally{btn.disabled=false;btn.innerHTML='💡 AI 解释'}
+}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
